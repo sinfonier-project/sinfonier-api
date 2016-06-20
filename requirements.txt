@@ -1,0 +1,9 @@
+bs4
+scp
+jinja2
+tornado
+pymongo
+paramiko
+#pycrypto
+simplegist
+BeautifulSoup4

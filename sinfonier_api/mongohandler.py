@@ -16,15 +16,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pymongo
-from pymongo import MongoClient
-
 import datetime
 
-import config
+from pymongo import MongoClient
 from tornado.options import options
 
-class MongoHandler():
+
+class MongoHandler(object):
 
 	def __init__(self):
 		self.client = None

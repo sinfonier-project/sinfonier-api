@@ -16,15 +16,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import config
-from tornado.options import options
-
 import utils
-from utils import *
-
-from urllib2 import URLError
+import config
 import requests
 
+from utils import *
+from tornado.options import options
 from bs4 import BeautifulSoup
 
 api_logger = config.getlog()
@@ -50,13 +47,13 @@ class Status(BaseHandler):
 			api_logger.info("HEADERS: "+str(self.request))
 			# Parse each param
 			data = self.arguments
-			if 'name' not in data.keys() and 'lines' not in data.keys():
+			if 'name' not in list(data.keys()) and 'lines' not in list(data.keys()):
 				api_logger.error("Error requests params.")
 				self.finish('{"result":"error","description":"Error requests params"}')
 			else:
 				try:
 					t_name = data['name']
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Error requests params "+str(e))
 					self.finish('{"result":"error","description":"Error requests params","debug":"'+str(e)+'"}')
 				# <STORM_PATH>/storm/bin/storm list
@@ -82,7 +79,7 @@ class Status(BaseHandler):
 										api_logger.info("Status found: "+str(aux))
 										topoState = aux
 										break
-							except Exception, e:
+							except Exception as e:
 								api_logger.error("Error parsing errors from output. "+str(e))
 								pass
 					if not notFound:
@@ -97,6 +94,7 @@ class Status(BaseHandler):
 		else:
 			api_logger.error("Content-Type:application/json missing")
 			self.finish('{"result":"error","description":"Content-Type:application/json missing"}')
+
 
 class StatusV3(BaseHandler):
 	"""
@@ -117,18 +115,18 @@ class StatusV3(BaseHandler):
 			api_logger.info("HEADERS: "+str(self.request))
 			# Parse each param
 			data = self.arguments
-			if 'name' not in data.keys():
+			if 'name' not in list(data.keys()):
 				api_logger.error("Error requests params.")
 				self.finish('{"result":"error","description":"Error requests params"}')
 			else:
 				try:
 					t_name = data['name']
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Error requests params "+str(e))
 					self.finish('{"result":"error","description":"Error requests params","debug":"'+str(e)+'"}')
 			try:
 				response = stormuiapi.getTopologySummaryByName(t_name)
-			except Exception, e:
+			except Exception as e:
 				api_logger.error("Error querying Storm UI API "+str(e))
 				self.finish('{"result":"error","description":"Error querying Storm UI API","debug":"'+str(e)+'"}')
 
@@ -140,11 +138,10 @@ class StatusV3(BaseHandler):
 			else:
 				api_logger.info("StormUI Api: Status NOT found because Topology NOT found!")
 				self.finish('{"result":"error","description":"Status NOT found because Topology NOT found", "detail":""}')
-
-		
 		else:
 			api_logger.error("Content-Type:application/json missing")
 			self.finish('{"result":"error","description":"Content-Type:application/json missing"}')
+
 
 class StatusV2(BaseHandler):
 	"""
@@ -165,34 +162,38 @@ class StatusV2(BaseHandler):
 			api_logger.info("HEADERS: "+str(self.request))
 			# Parse each param
 			data = self.arguments
-			if 'name' not in data.keys():
+			if 'name' not in list(data.keys()):
 				api_logger.error("Error requests params.")
 				self.finish('{"result":"error","description":"Error requests params"}')
 			else:
 				try:
 					t_name = data['name']
-				except Exception, e:
-					api_logger.error("Error requests params "+str(e))
-					self.finish('{"result":"error","description":"Error requests params","debug":"'+str(e)+'"}')
+				except KeyError as e:
+					api_logger.error("Error requests params %s" % str(e))
+					self.finish('{"result":"error","description":"Error requests params","debug":"%s"}' % str(e))
+					return
+
 				# Check status on UI
 				try:
 					url = "http://127.0.0.1:8080"
-					api_logger.debug("URL to fecth: "+url)
-					content = urllib2.urlopen(url).read()
+					api_logger.debug("URL to fetch: %s" % url)
+					content = requests.get(url).text
+
 					soup = BeautifulSoup(content)
 					status = soup.find('a', href=True, text=t_name).find_parent().find_parent().findAll('td')[2].text
 					api_logger.debug("Status found! "+status)
+
 					self.finish('{"result":"success","description":"Status found", "detail":"'+str(status)+'"}')
-				except URLError, e:
+				except requests.exceptions.HTTPError as e:
 					api_logger.error("Error getting data from Storm UI"+str(e))
 					self.finish('{"result":"error","description":"Error getting data from Storm UI", "detail":"'+str(e)+'"}')
-				except AttributeError, e:
+				except AttributeError as e:
 					api_logger.error("Error parsing data from Storm UI"+str(e))
 					self.finish('{"result":"error","description":"Error parsing data from Storm UI", "detail":"'+str(e)+'"}')
-				except IndexError, e:
+				except IndexError as e:
 					api_logger.error("Error parsing data from Storm UI"+str(e))
 					self.finish('{"result":"error","description":"Error parsing data from Storm UI", "detail":"'+str(e)+'"}')
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Uknown error "+str(e))
 					self.finish('{"result":"error","description":"Uknown error", "detail":"'+str(e)+'"}')
 				
