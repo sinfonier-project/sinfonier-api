@@ -16,15 +16,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+import json
 import requests
 
 
 class StormUIAPI:
-
-
 	def __init__(self, stormhost="localhost", stormport=8080):
 
-		self.HOST = "http://"+stormhost+":"+str(stormport)
+		self.HOST = "http://%s:%s" % (stormhost, str(stormport))
 
 	# GET Operations
 
@@ -32,11 +32,9 @@ class StormUIAPI:
 	# /api/v1/cluster/configuration (GET)
 	# Returns the cluster configuration.
 	######################################
-
 	def getClusterConfiguration(self):
-		url = self.HOST+"/api/v1/cluster/configuration"
+		url = "%s%s" % (self.HOST, "/api/v1/cluster/configuration")
 		return requests.get(url).json()
-
 
 	######################################
 	# /api/v1/cluster/summary (GET)
@@ -44,9 +42,8 @@ class StormUIAPI:
 	######################################
 
 	def getClusterSummary(self):
-		url = self.HOST+"/api/v1/cluster/summary"
+		url = self.HOST + "/api/v1/cluster/summary"
 		return requests.get(url).json()
-
 
 	######################################
 	# /api/v1/supervisor/summary (GET)
@@ -54,7 +51,7 @@ class StormUIAPI:
 	######################################
 
 	def getSupervisorSummary(self):
-		url = self.HOST+"/api/v1/supervisor/summary"
+		url = self.HOST + "/api/v1/supervisor/summary"
 		return requests.get(url).json()
 
 	######################################
@@ -63,7 +60,7 @@ class StormUIAPI:
 	######################################
 
 	def getTopologySummary(self):
-		url = self.HOST+"/api/v1/topology/summary"
+		url = self.HOST + "/api/v1/topology/summary"
 		return requests.get(url).json()
 
 	######################################
@@ -71,8 +68,8 @@ class StormUIAPI:
 	# Returns topology information and statistics. Substitute id with topology id.
 	######################################
 
-	def getTopology(self,topologyid):
-		url = self.HOST+"/api/v1/topology/"+topologyid
+	def getTopology(self, topologyid):
+		url = self.HOST + "/api/v1/topology/" + topologyid
 		return requests.get(url).json()
 
 	######################################
@@ -80,8 +77,8 @@ class StormUIAPI:
 	# Returns detailed metrics and executor information
 	######################################
 
-	def getTopologyComponent(self,topologyid, componentid):
-		url = self.HOST+"/api/v1/topology/"+topologyid+"/component/"+componentid
+	def getTopologyComponent(self, topologyid, componentid):
+		url = self.HOST + "/api/v1/topology/" + topologyid + "/component/" + componentid
 		return requests.get(url).json()
 
 	# POST Operations
@@ -91,7 +88,7 @@ class StormUIAPI:
 	# uploads a topology.
 	######################################
 
-	def uploadTopology(self,topologyConfig, topologyJar):
+	def uploadTopology(self, topologyConfig, topologyJar):
 		return "Not implemented yet in this version"
 
 	######################################
@@ -99,8 +96,8 @@ class StormUIAPI:
 	# Activates a topology.
 	######################################
 
-	def activateTopology(self,topologyid):
-		url = self.HOST+"/api/v1/topology/"+topologyid+"/activate"
+	def activateTopology(self, topologyid):
+		url = self.HOST + "/api/v1/topology/" + topologyid + "/activate"
 		return requests.post(url).json()
 
 	######################################
@@ -108,19 +105,20 @@ class StormUIAPI:
 	# Deactivates a topology.
 	######################################
 
-	def deactivateTopology(self,topologyid):
-		url = self.HOST+"/api/v1/topology/"+topologyid+"/deactivate"
+	def deactivateTopology(self, topologyid):
+		url = self.HOST + "/api/v1/topology/" + topologyid + "/deactivate"
 		return requests.post(url).json()
 
 	######################################
 	# /api/v1/topology/:id/rebalance/:wait-time (POST)
 	# Rebalances a topology.
-	# rebalanceOptions = {"rebalanceOptions": {"numWorkers": 2, "executors": { "spout" : "5", "split": 7, "count": 5 }}, "callback":"foo"}
+	# rebalanceOptions = {"rebalanceOptions": {"numWorkers": 2, "executors": { "spout" : "5", "split": 7, "count": 5
+	# }}, "callback":"foo"}
 	######################################
 
-	def rebalanceTopology(self,topologyid, wait_time, rebalanceOptions={}):
-		url = self.HOST+"/api/v1/topology/"+topologyid+"/rebalance/"+wait_time
-		headers = {"Content-Type" : "application/json"}
+	def rebalanceTopology(self, topologyid, wait_time, rebalanceOptions={}):
+		url = self.HOST + "/api/v1/topology/" + topologyid + "/rebalance/" + wait_time
+		headers = {"Content-Type": "application/json"}
 		return requests.post(url, data=json.dumps(rebalanceOptions), headers=headers).json()
 
 	######################################
@@ -128,17 +126,16 @@ class StormUIAPI:
 	# Kills a topology.
 	######################################
 
-	def killTopology(self,topologyid, wait_time):
-		url = self.HOST+"/api/v1/topology/"+topologyid+"/kill/"+wait_time
+	def killTopology(self, topologyid, wait_time):
+		url = self.HOST + "/api/v1/topology/" + topologyid + "/kill/" + wait_time
 		return requests.post(url).json()
-
 
 	######################################
 	# Get topology summary by name (GET)
 	# This function makes 1 StormUI API query
 	######################################
 
-	def getTopologySummaryByName(self,topologyname):
+	def getTopologySummaryByName(self, topologyname):
 		response = self.getTopologySummary()
 		topologies = response["topologies"]
 		for topo in topologies:
@@ -151,12 +148,12 @@ class StormUIAPI:
 	# This function makes 2 StormUI API queries
 	######################################
 
-	def getTopologyByName(self,topologyname):
+	def getTopologyByName(self, topologyname):
 		response = self.getTopologySummary()
 		topologies = response["topologies"]
 		for topo in topologies:
 			if topo["name"] == topologyname:
-				response = getTopology(topo["id"])
+				response = self.getTopology(topo["id"])
 				return response
 		return {}
 
@@ -165,9 +162,8 @@ class StormUIAPI:
 	# This function makes 2 StormUI API queries
 	######################################
 
-	## Return workers list from all spouts and all executors of the topology. Without duplicates. 
-
-	def getWorkersByTopologyID(self,topologyid):
+	## Return workers list from all spouts and all executors of the topology. Without duplicates.
+	def getWorkersByTopologyID(self, topologyid):
 		topo = self.getTopology(topologyid)
 		spoutids = [spout["spoutId"] for spout in topo["spouts"]]
 		workersLinks = list()
@@ -182,9 +178,8 @@ class StormUIAPI:
 	# This function makes 3 StormUI API queries
 	######################################
 
-	## Return workers list from all spouts and all executors of the topology. Without duplicates. 
-
-	def getWorkersByTopologyName(self,topologyname):
+	## Return workers list from all spouts and all executors of the topology. Without duplicates.
+	def getWorkersByTopologyName(self, topologyname):
 		topo = self.getTopologyByName(topologyname)
 		spoutids = [spout["spoutId"] for spout in topo["spouts"]]
 		workersLinks = list()
@@ -199,17 +194,17 @@ class StormUIAPI:
 	# This function makes 2 StormUI API queries
 	######################################
 
-	def getErrorInTopologyByName(self,topologyname):
+	def getErrorInTopologyByName(self, topologyname):
 		topo = self.getTopologyByName(topologyname)
 		if topo:
 			# Return True if there is an error in any module of the topology and False if not
-			return any(module["lastError"] for module in (topo["spouts"]+topo["bolts"]))
+			return any(module["lastError"] for module in (topo["spouts"] + topo["bolts"]))
 
 	######################################
 	# Get error details in topology by topology Name (GET)
 	# This function makes 2 StormUI API queries
 	######################################
-
-	def getErrorDetailsInTopologyByName(self,topologyname):
+	def getErrorDetailsInTopologyByName(self, topologyname):
 		topo = self.getTopologyByName(topologyname)
-		return [{module["spoutId"] : module["lastError"]} for module in topo["spouts"]]+[{module["boltId"] : module["lastError"]} for module in topo["bolts"]] if topo else None
+		return [{module["spoutId"]: module["lastError"]} for module in topo["spouts"]] + [
+			{module["boltId"]: module["lastError"]} for module in topo["bolts"]] if topo else None

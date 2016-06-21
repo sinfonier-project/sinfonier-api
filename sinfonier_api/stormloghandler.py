@@ -53,14 +53,14 @@ class GetLog(BaseHandler):
 			api_logger.info("HEADERS: "+str(self.request))
 			# Parse each param
 			data = self.arguments
-			if 'name' not in data.keys() and 'lines' not in data.keys():
+			if 'name' not in list(data.keys()) and 'lines' not in list(data.keys()):
 				api_logger.error("Error requests params.")
 				self.finish('{"result":"error","description":"Error requests params"}')
 			else:
 				try:
 					t_name = data['name']
 					t_lines = data['lines']
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Error requests params "+str(e))
 					self.finish('{"result":"error","description":"Error requests params","debug":"'+str(e)+'"}')
 				try:
@@ -85,7 +85,7 @@ class GetLog(BaseHandler):
 					self.set_header ('Content-Type', 'text/plain')
 					self.set_header ('Content-Disposition', 'attachment; filename='+fileName+'')
 					self.finish(lines)
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Error getting topology log "+str(e))
 					self.finish('{"result":"error","description":"Error getting topology log.", "detail":"Log not found, wait while your topology create it."}')
 	
@@ -113,14 +113,14 @@ class GetLogV3(BaseHandler):
 			api_logger.info("HEADERS: "+str(self.request))
 			# Parse each param
 			data = self.arguments
-			if 'name' not in data.keys() and 'lines' not in data.keys():
+			if 'name' not in list(data.keys()) and 'lines' not in list(data.keys()):
 				api_logger.error("Error requests params.")
 				self.finish('{"result":"error","description":"Error requests params"}')
 			else:
 				try:
 					t_name = data['name']
 					t_lines = data['lines']
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Error requests params "+str(e))
 					self.finish('{"result":"error","description":"Error requests params","debug":"'+str(e)+'"}')
 				try:
@@ -134,7 +134,7 @@ class GetLogV3(BaseHandler):
 						content = ""
 						try:
 							content = requests.get(url).content
-						except Exception, e:
+						except Exception as e:
 							api_logger.error("Error getting log from Storm UI : "+str(e))
 							self.finish('{"result":"error","description":"Error getting log from Storm UI: ", "detail":"'+str(e)+'"}')
 						try:
@@ -144,13 +144,13 @@ class GetLogV3(BaseHandler):
 							self.set_header ('Content-Type', 'text/plain')
 							self.set_header ('Content-Disposition', 'attachment; filename='+filename+'')
 							self.finish(lines)
-						except Exception, e:
+						except Exception as e:
 							api_logger.error("Error parsing data from Storm UI"+str(e))
 							self.finish('{"result":"error","description":"Error parsing data from Storm UI: ", "detail":"'+str(e)+'"}')
 					else:
 						api_logger.error("Error getting worker from Storm UI API")
 						self.finish('{"result":"error","description":"Error getting worker from Storm UI API", "detail":""}')
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Unknown error"+str(e))
 					self.finish('{"result":"error","description":"Error getting topology log: ", "detail":"'+str(e)+'"}')
 		else:
@@ -177,14 +177,14 @@ class GetLogV2(BaseHandler):
 			api_logger.info("HEADERS: "+str(self.request))
 			# Parse each param
 			data = self.arguments
-			if 'name' not in data.keys() and 'lines' not in data.keys():
+			if 'name' not in list(data.keys()) and 'lines' not in list(data.keys()):
 				api_logger.error("Error requests params.")
 				self.finish('{"result":"error","description":"Error requests params"}')
 			else:
 				try:
 					t_name = data['name']
 					t_lines = data['lines']
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Error requests params "+str(e))
 					self.finish('{"result":"error","description":"Error requests params","debug":"'+str(e)+'"}')
 				try:
@@ -200,7 +200,7 @@ class GetLogV2(BaseHandler):
 					content = ""
 					try:
 						content = requests.get(url).content
-					except Exception, e:
+					except Exception as e:
 						api_logger.error("Error getting log from Storm UI : "+str(e))
 						self.finish('{"result":"error","description":"Error getting log from Storm UI: ", "detail":"'+str(e)+'"}')
 					try:
@@ -210,10 +210,10 @@ class GetLogV2(BaseHandler):
 						self.set_header ('Content-Type', 'text/plain')
 						self.set_header ('Content-Disposition', 'attachment; filename='+fileName+'')
 						self.finish(lines)
-					except Exception, e:
+					except Exception as e:
 						api_logger.error("Error parsing data from Storm UI"+str(e))
 						self.finish('{"result":"error","description":"Error parsing data from Storm UI: ", "detail":"'+str(e)+'"}')
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Unknown error"+str(e))
 					self.finish('{"result":"error","description":"Error getting topology log: ", "detail":"'+str(e)+'"}')
 		else:

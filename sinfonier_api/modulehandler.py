@@ -16,18 +16,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import utils
+import time
+import shutil
 import config
+
+from random import randint
 from tornado.options import options
 
-import shutil
-import time
-from random import randint
-
-import utils
 from utils import *
 
 api_logger = config.getlog()
 stormuiapi = config.getStormUIAPI()
+
 
 class CompileModule(BaseHandler):
 	"""
@@ -51,7 +52,7 @@ class CompileModule(BaseHandler):
 			api_logger.info("HEADERS: "+str(self.request))
 			# Parse each param
 			data = self.arguments
-			if 'name' not in data.keys() or 'type' not in data.keys() or 'lang' not in data.keys():
+			if 'name' not in list(data.keys()) or 'type' not in list(data.keys()) or 'lang' not in list(data.keys()):
 				api_logger.error("Error requests params")
 				self.finish('{"result":"error","description":"Error requests params"}')
 			else:
@@ -60,14 +61,14 @@ class CompileModule(BaseHandler):
 					t_type = data['type']
 					t_lang = data['lang']
 					t_gist = data['gist']
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Error requests params "+str(e))
 					self.finish('{"result":"error","description":"Error requests params","debug":"'+str(e)+'"}')
 			# Create working dir
 			try:
 				workingPath = "/var/storm/src/sinfonier_backend"+str(int(time.time()+randint(50,150)))
 				shutil.copytree(options.backend_working_path,workingPath)
-			except Exception, e:
+			except Exception as e:
 				api_logger.error("Error creating working dir. "+str(e))
 				self.finish('{"result":"error","description":"Error creating working dir","debug":"'+str(e)+'"}')
 			
@@ -111,7 +112,7 @@ class CompileModule(BaseHandler):
 				fileName = util.get_module(t_name,module_lang,t_gist,dst_path,t_type)
 				api_logger.info("Module Added: "+str(fileName))
 				fileCreated = True
-			except Exception,e:
+			except Exception as e:
 				shutil.rmtree(workingPath)
 				api_logger.error("Error creating source code file. Deleted working repo. "+str(e))
 				self.finish('{"result":"error","description":"Error creating file","debug":"'+str(e)+'"}')
@@ -142,7 +143,7 @@ class CompileModule(BaseHandler):
 								dedugStack += time.strftime("%m-%d-%Y %H:%M:%S")+": "
 								dedugStack += line.split("com/sinfonier")[1]
 								dedugStack += "|"
-							except Exception, e:
+							except Exception as e:
 								api_logger.error("Error parsing errors from output. "+str(e))
 								pass
 						if "BUILD FAILURE" in line:
@@ -155,7 +156,7 @@ class CompileModule(BaseHandler):
 								warStack += time.strftime("%m-%d-%Y %H:%M:%S")+": "
 								warStack += line.split("com/sinfonier")[1]
 								warStack += "|"
-							except Exception, e:
+							except Exception as e:
 								api_logger.error("Error parsing errors from output. "+str(e))
 								pass
 						if "Finished at:" in line:
@@ -199,7 +200,7 @@ class LoadModule(BaseHandler):
 			api_logger.info("HEADERS: "+str(self.request))
 			# Parse each param
 			data = self.arguments
-			if 'name' not in data.keys() or 'type' not in data.keys() or 'lang' not in data.keys():
+			if 'name' not in list(data.keys()) or 'type' not in list(data.keys()) or 'lang' not in list(data.keys()):
 				api_logger.error("Error requests params")
 				self.finish('{"result":"error","description":"Error requests params"}')
 			else:
@@ -208,7 +209,7 @@ class LoadModule(BaseHandler):
 					t_type = data['type']
 					t_lang = data['lang']
 					t_gist = data['gist']
-				except Exception, e:
+				except Exception as e:
 					api_logger.error("Error requests params "+str(e))
 					self.finish('{"result":"error","description":"Error requests params","debug":"'+str(e)+'"}')	
 
@@ -243,7 +244,7 @@ class LoadModule(BaseHandler):
 				fileName = util.get_module(t_name,module_lang,t_gist,dst_path,t_type)
 				api_logger.info("Module Added: "+str(fileName))
 				fileCreated = True
-			except Exception,e:
+			except Exception as e:
 				shutil.rmtree(workingPath)
 				api_logger.error("Error creating source code file. Deleted working repo. "+str(e))
 				self.finish('{"result":"error","description":"Error creating file","debug":"'+str(e)+'"}')
@@ -281,7 +282,7 @@ class LoadModule(BaseHandler):
 									dedugStack += time.strftime("%m-%d-%Y %H:%M:%S")+": "
 									dedugStack += line.split("com/sinfonier")[1]
 									dedugStack += "|"
-								except Exception, e:
+								except Exception as e:
 									api_logger.error("Error parsing errors from output. "+str(e))
 									pass
 							if "BUILD FAILURE" in line:
@@ -294,7 +295,7 @@ class LoadModule(BaseHandler):
 									warStack += time.strftime("%m-%d-%Y %H:%M:%S")+": "
 									warStack += line.split("com/sinfonier")[1]
 									warStack += "|"
-								except Exception, e:
+								except Exception as e:
 									api_logger.error("Error parsing errors from output. "+str(e))
 									pass
 							if "Finished at:" in line:

@@ -17,24 +17,24 @@
 # limitations under the License.
 
 import config
-from tornado.options import options
-
-from mongohandler import *
-from topologyhandler import *
-from modulehandler import *
-from stormloghandler import *
-from statushandler import *
-
-import tornado.ioloop
 import tornado.web
+import tornado.ioloop
 import tornado.httpserver
 
+from mongohandler import *
+from modulehandler import *
+from statushandler import *
+from stormloghandler import *
+from topologyhandler import *
+from tornado.options import options
+
 api_logger = config.getlog()
+
 
 class MainHandler(tornado.web.RequestHandler):
 	
 	def get(self):
-		api_logger.info("HEADERS: "+str(self.request))
+		api_logger.info("HEADERS: %s" % str(self.request))
 		self.write("Sinfonier API v0.1.")
 
 
@@ -54,7 +54,8 @@ application = tornado.web.Application([
 	(r"/apistatus",StatusV3)
 ])
 
-if __name__ == "__main__":
+
+def main():
 	sockets = tornado.netutil.bind_sockets(options.port)
 	tornado.process.fork_processes(options.concurrency)
 	server = tornado.httpserver.HTTPServer(application)
@@ -62,3 +63,6 @@ if __name__ == "__main__":
 	tornado.ioloop.IOLoop.instance().start()
 	server = tornado.httpserver.HTTPServer(application)
 
+
+if __name__ == "__main__":
+	main()

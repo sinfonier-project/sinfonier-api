@@ -12,42 +12,42 @@ Apache Storm:
 
 > Apache Storm is a free and open source distributed realtime computation system. Storm makes it easy to reliably process unbounded streams of data, doing for realtime processing what Hadoop did for batch processing. Storm is simple, can be used with any programming language, and is a lot of fun to use!
 
-## Description
+# Description
 
 * Compile modules
 * Manage Sinfonier Backend classpath
 * Start/Stop Storm toplogies
 * Storm Log management
 
-## Installation
+# Installation
 
-### Dependencies
+## OS dependencies
 
-Jinga2
+**Centos**:
 
-```sh
-$ cd /tmp/
-$ wget https://pypi.python.org/packages/source/J/Jinja2/Jinja2-2.8.tar.gz
-$ tar xvf Jinja2-2.8.tar.gz
-$ cd Jinja2-2.8/
-$ sudo python setup.py install
-```
-
-Crypto
-
-```sh
+```bash
 $ sudo yum install python-crypto
 ```
 
-PIP Dependencies
+**Debian / Ubuntu**:
 
-```sh
-$ sudo pip install tornado requests pymongo simplegist paramiko scp BeautifulSoup4
+```bash
+$ sudo apt-get install python-crypto
 ```
 
-### Configure 
+## Python dependencies
 
-MONGO CONFIG
+```bash
+$ sudo pip install -r requirements.txt
+```
+
+# Configuration 
+
+## Associated services
+
+In `config.py`:
+
+**MONGO CONFIG**
 
 ```python
 define("port", default=8899, help="run on the given port", type=int)
@@ -57,7 +57,7 @@ define("mongo_database", default="sinfonier", help="mongo database name")
 define("mongo_collection", default="topologies", help="mongo collection name")
 ```
 
-STORM CLUSTER GLOBAL CONFIG
+**STORM CLUSTER GLOBAL CONFIG**
 
 ```python
 define("storm_binary", default="<STORM_PATH>/bin/storm", help="storm binay")
@@ -65,7 +65,7 @@ define("storm_global_jar_path", default="/var/storm/lastjar/", help="storm binar
 define("storm_global_jar_bin", default="sinfonier-community-1.0.0.jar", help="storm binay")
 ```
 
-TOPOLOGIES CONFIG
+**TOPOLOGIES CONFIG**
 
 ```python
 define("storm_topology_path", default="/var/storm/topologies/", help="storm xml path")
@@ -74,11 +74,11 @@ define("storm_topology_data_path", default="/data/storm/topologies/", help="topo
 define("storm_topology_jar_path", default="/jar/", help="storm topology config folder")
 ```
 
-FOLDER STRUCTURE
+**FOLDER STRUCTURE**
 
     /var/storm/topologies/{topologyName}/config/{topologyName}.xml
 
-MAVEN CONFIG
+**MAVEN CONFIG**
 
 ```python
 define("maven_binary", default="<MAVEN_PATH>/bin/mvn", help="maven binay")
@@ -86,7 +86,8 @@ define("maven_sinfonier_pom", default="/var/storm/src/sinfonier_backend/pom.xml"
 define("maven_sinfonier_m2_pom", default="/var/storm/src/sinfonier_backend/m2-pom.xml", help="maven m2-pom")
 ```
 
-STORMBACKEND
+**STORMBACKEND**
+
 ```python
 define("backend_working_path", default="/var/storm/src/sinfonier_backend/", help="backend path")
 define("backend_python_path", default="/var/storm/src/sinfonier_backend/multilang/resources/", help="backend python path")
@@ -97,27 +98,61 @@ define("backend_java_path_bolts", default="/var/storm/src/sinfonier_backend/src/
 define("backend_java_path_spouts", default="/var/storm/src/sinfonier_backend/src/jvm/com/sinfonier/spouts/", help="backend spouts")
 ```
 
-API TEMPLATES
+**API TEMPLATES**
 
 ```python
 define("backend_template_path", default="/opt/sinfonier-api/templates/", help="API templates")
 ```
 
-GIST CREDENTIALS
+**GIST CREDENTIALS**
 
 ```python
 define("gist_api_token",default="<YOUR_GIST_TOKEN>",help="gist api token")
 define("gist_username",default="<GIST_USER>",help="gist username")
 ```
 
+## Logging
 
-### Deploy
+You can customize the logging path setting the environment var:
+ 
+```bash
+# export SINFONIER_LOG="/var/log/sinfonier-log"
+```
 
-```sh
+**Make sure the log folder exits**, if not, app will crash.
+
+# Deploy
+
+## From source
+
+
+```bash
 $ cd /opt
 $ git clone https://github.com/sinfonier-project/sinfonier-api.git
 $ python sinfonierapicore.py
+```
 
+## From Pypi (RECOMENDED)
+
+```bash
+# pip install sinfonier-api
+# sinfonier-api
+
+```
+
+## Using Docker
+
+```bash
+# docker build -t sinfonier:api .
+Sending build context to Docker daemon 816.6 kB
+Step 1 : FROM python:2.7
+ ---> a047e3d0ae2b
+Step 2 : MAINTAINER Sinfonier Project
+ ---> Using cache
+ ---> be5b52b240e5
+ ....
+
+# docker run -t sinfonier:api
 ```
 
 ## Project leads
@@ -129,9 +164,9 @@ $ python sinfonierapicore.py
 
 * Eva Suarez @EvaSuarez22
 * Pedro J. Martinez @pejema44
+* Daniel García (cr0hn) - @ggdaniel
 
 ## Contributors
-
 
 ## License
 
